@@ -1,0 +1,33 @@
+import os
+import cv2 as cv
+import xml.etree.ElementTree as ET
+import collections #统计模块
+
+#-----读取xml文件来统计训练数据集中每类的个数--------
+#classes列表中放入需要训练的类别
+classes = ["scratch", "pit", "convex", "abrasion"]
+
+def Statistic(xmls_path):
+    classNum = []
+    xmls_list = os.listdir(xmls_path)  # 读取xml列表
+    for xml_name in xmls_list:
+        temp2 = xml_name.split('.')[0]  # xml名
+        temp2_ = xml_name.split('.')[1]
+        if temp2_ != 'xml':
+            continue
+        xml_path = os.path.join(xmls_path, xml_name)
+        root = ET.parse(xml_path).getroot()
+        for obj in root.iter('object'):
+            difficult = obj.find('difficult').text
+            cls = obj.find('name').text
+            if cls not in classes or int(difficult) == 1:
+                continue
+            classNum.append(cls)
+
+    List = collections.Counter(classNum)
+    print(List)
+
+if __name__ == '__main__':
+	#要读取的xml文件夹路径
+    xmls_path = r"D:/zhuomian/gangban自制缺陷/Annotations"
+    Statistic (xmls_path)
